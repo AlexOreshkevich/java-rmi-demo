@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+    <bean id="mainFrame" class="view.MainFrame" init-method="init">
+        <property name="contentPane" ref="usersPanel"/>
+        <property name="title" value="My To Do List"/>
+    </bean>
+
+    <bean id="buttonPanel" class="view.BoxLayoutPanel" init-method="init">
+        <property name="axis" value="0"/>
+        <property name="panelComponents">
+            <list>
+                <ref bean="deleteButton"/>
+                <ref bean="addNewButton"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="deleteButton" class="view.button.ActionListenerButton" init-method="init">
+        <property name="actionListener" ref="deleteButtonActionListener"/>
+        <property name="text" value="Delete"/>
+    </bean>
+
+    <bean id="deleteButtonActionListener" class="action.DeleteButtonActionListener">
+        <property name="list" ref="usersList"/>
+        <property name="table" ref="usersTable"/>
+        <property name="controller" ref="userController"/>
+    </bean>
+
+    <bean id="addNewButton" class="view.button.ActionListenerButton" init-method="init">
+        <property name="actionListener" ref="addNewButtonActionListener"/>
+        <property name="text" value="Add New"/>
+    </bean>
+
+    <bean id="addNewButtonActionListener" class="action.AddNewButtonActionListener">
+        <property name="list" ref="usersList"/>
+        <property name="table" ref="usersTable"/>
+        <property name="controller" ref="userController"/>
+    </bean>
+
+    <bean id="usersList" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <ref bean="defaultUser"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="columnNamesForUserTable" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <value>#</value>
+                <value>Name</value>
+                <value>Password</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="defaultUser" class="model.User">
+        <property name="id" value="1"/>
+        <property name="name" value="Pavel"/>
+        <property name="passwd" value="myPasswordIs******"/>
+    </bean>
+
+    <bean id="usersTableModel" class="view.UserTableModel">
+        <property name="usersList" ref="usersList"/>
+        <property name="columns" ref="columnNamesForUserTable"/>
+    </bean>
+
+    <bean id="usersTable" class="javax.swing.JTable">
+        <property name="model" ref="usersTableModel"/>
+    </bean>
+
+    <bean id="usersScrollPane" class="javax.swing.JScrollPane">
+        <constructor-arg ref="usersTable"/>
+    </bean>
+
+    <bean id="usersPanel" class="view.BoxLayoutPanel" init-method="init">
+        <property name="axis" value="1"/>
+        <property name="panelComponents">
+            <list>
+                <ref bean="usersScrollPane"/>
+                <ref bean="buttonPanel"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="userController" class="controller.UserController">
+        <property name="srv" ref="userService"/>
+    </bean>
+
+    <bean id="userService" class="service.UserServiceImpl">
+        <property name="userList" ref="usersList"/>
+        <property name="commandManager" ref="commandManager"/>
+        <property name="random">
+            <bean class="java.util.Random"/>
+        </property>
+    </bean>
+
+    <bean id="commandManager" class="support.CommandManager">
+        <constructor-arg ref="registry"/>
+    </bean>
+
+    <bean id="registry" class="java.rmi.registry.LocateRegistry" factory-method="getRegistry">
+        <constructor-arg value="localhost"/>
+        <constructor-arg value="2005"/>
+    </bean>
+</beans>
