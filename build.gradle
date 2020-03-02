@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'jacoco'
+    id "me.champeau.gradle.jmh" version "0.5.0"
+}
+
+apply from: "${rootDir}/gradle/checkstyle.gradle"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_12
+    targetCompatibility = JavaVersion.VERSION_12
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+
+    // testing
+    implementation 'junit:junit:4.13'
+    testCompile("org.assertj:assertj-core:3.11.1")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+test {
+    maxParallelForks = 4
+    forkEvery = 1
+    maxHeapSize = "512m"
+    failFast = false
+    outputs.upToDateWhen { false }
+}
+
+jmh {
+    jmhVersion = '1.23'
+    humanOutputFile = null
+    warmupIterations = 1
+    iterations = 1
+    includeTests = true
+    timeUnit = 'us'
+    fork = 4
+    timeout = '1s'
+    jvmArgs = ['-Xmx4G']
+}
